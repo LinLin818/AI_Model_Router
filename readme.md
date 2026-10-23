@@ -1,0 +1,86 @@
+AI Router Model
+
+A small machine learning model that decides, for each incoming prompts, whether a cheap, fast LLM is suffice or thr request should go to a stronger more expensive LLM. The goal is to reduce token costs while reserving the answer quality.
+
+How it works:
+1. Each prompt is turned into features (TF-IDF text features plus simple signals like length, code, and reasoning keywords).
+2. A logistic regression model learns `P(cheap model is good enough | prompt)` from training data.
+3. At inference time, the prompt goes to the cheap model if that probability clears a threshold. Otherwise it goes to the strong model.
+4. The threshold is tuned on out-of-fold predictions, so it targets a chosen share of the strong model's quality (97% by default) at the lowest cost.
+
+The router is compared against four policies: always strong, always cheap, the router, and an oracle (perfect routing, as an upper bound).
+
+## Setup
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+## Usage
+
+Generate synthetic demo data and train:
+
+```bash
+python scripts/make_demo_data.py
+python -m router.train
+```
+
+> The demo data is synthetic, with made-up scores. It only shows the pipeline works and says nothing about real routing quality.
+
+Route a prompt:
+
+```python
+from router import Router
+
+router = Router.load("artifacts/router.joblib")
+decision = router.route("What is the capital of France?")
+print(decision.routed_to, decision.model, decision.p_cheap_ok)
+```
+
+## Using real data
+
+Training data is JSONL, one row per prompt:
+
+```json
+{"prompt": "...", "cheap_score": 0.8, "strong_score": 0.9}
+```
+
+`scripts/collect_data.py` builds this by running each prompt through two models and having a judge score the answers. It needs an Anthropic API key and makes paid API calls.
+
+```bash
+pip install anthropic
+export ANTHROPIC_API_KEY=your-key-here
+python scripts/collect_data.py --prompts my_prompts.txt --out data/real.jsonl
+python -m router.train --data data/real.jsonl
+```
+
+## Project structure
+
+```
+router/
+  features.py   # prompt -> feature vector
+  train.py      # training and threshold selection
+  evaluate.py   # cost/quality evaluation
+  router.py     # inference-time Router class
+scripts/
+  make_demo_data.py   # synthetic training data
+  collect_data.py     # real data from live models
+```
+
+## Tuning
+
+| Flag | What it does |
+|---|---|
+| `--target-retention` | Share of strong-model quality to keep. Lower saves more money. |
+| `--margin` | How much worse than the strong model still counts as "good enough". |
+| `--cheap-cost` / `--strong-cost` | Relative cost per call for each model. |
+| `--backend embeddings` | Use sentence embeddings instead of TF-IDF. |
+
+## Ideas for next steps
+
+- Train on real prompts and compare against the demo results.
+- Try sentence embeddings or gradient boosting.
+- Add more than two model tiers.
+- Log routing decisions in production and retrain as traffic changes.
