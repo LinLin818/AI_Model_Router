@@ -1,0 +1,10 @@
+numpy
+scipy
+scikit-learn
+joblib
+
+# Optional: better prompt features (use with --backend embeddings)
+# sentence-transformers
+
+# Only needed for scripts/collect_data.py (real data collection)
+# anthropic
