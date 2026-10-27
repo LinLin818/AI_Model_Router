@@ -1,5 +1,5 @@
 import time
-from router import Router
+from router.router import Router
 
 r = Router.load("artifacts/router.joblib")
 prompts = ["What is the capital of France?"] * 1000

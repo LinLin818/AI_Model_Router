@@ -15,7 +15,8 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 
 import anthropic
-
+from dotenv import load_dotenv
+load_dotenv()
 client = anthropic.Anthropic()
 
 CATEGORIES = [
@@ -61,7 +62,7 @@ def generate(job, model, k):
     )
     try:
         r = client.messages.create(
-            model=model, max_tokens=4000, temperature=1.0,
+            model=model, max_tokens=4000,
             messages=[{"role": "user", "content": msg}],
 
         )
@@ -106,6 +107,8 @@ def main():
                     seen.add(key)
                     rows.append(row)
         print(f"round {round_no + 1}: {len(rows)} unique prompts")
+        if not any(batches):
+            raise SystemExit("Every batch failed. Fix the error above before retrying.")
 
     rows = rows[: a.n]
     import os
