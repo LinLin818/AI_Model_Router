@@ -18,26 +18,6 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-## Usage
-
-Generate synthetic demo data and train:
-
-```bash
-python scripts/make_demo_data.py
-python -m router.train
-```
-
-> The demo data is synthetic, with made-up scores. It only shows the pipeline works and says nothing about real routing quality.
-
-Route a prompt:
-
-```python
-from router import Router
-
-router = Router.load("artifacts/router.joblib")
-decision = router.route("What is the capital of France?")
-print(decision.routed_to, decision.model, decision.p_cheap_ok)
-```
 
 ## Using real data
 
