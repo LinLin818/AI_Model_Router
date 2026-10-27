@@ -13,6 +13,9 @@ from concurrent.futures import ThreadPoolExecutor
 
 import anthropic
 
+from dotenv import load_dotenv
+load_dotenv()
+
 client = anthropic.Anthropic()
 
 JUDGE_PROMPT = """You are grading an AI assistant's answer.
