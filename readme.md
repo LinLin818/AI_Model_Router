@@ -1,6 +1,6 @@
 AI Router Model
 
-A small machine learning model that decides, for each incoming prompts, whether a cheap, fast LLM is suffice or thr request should go to a stronger more expensive LLM. The goal is to reduce token costs while reserving the answer quality.
+I created this project because I want to solve a personal problem I currently have. When I use Claude or any other types of AI models, often times my tokens ran out pretty fast. I am pretty sure you had experienced this some time in your life. One token is burned for every 0.75 words. Humans typically write about 10 to 15 words in a single sentence and 100 to 200 words for a paragraph. One uploaded short file burned around 50 to 500 tokens, while 100 page-PDF can consume tens of thousands of tokens. Imagine how much tokens you can burn up too? Ok, enough rambling. Let’s get to the point of the project. The core idea is to create a system that can optimize the cost of token usage by analyzing the input prompts,  define the difficulty level and routing them to the most suitable AI model. For example, a simple question could be handled by smaller, less expensive AI models, while more complex questions or reasoning tasks could be routed to a more capable model. The goal is to avoid using the advance models without sacrificing the quality of responses.
 
 How it works:
 1. Each prompt is turned into features (TF-IDF text features plus simple signals like length, code, and reasoning keywords).
@@ -36,6 +36,8 @@ python scripts/collect_data.py --prompts my_prompts.txt --out data/real.jsonl
 python -m router.train --data data/real.jsonl
 ```
 
+
+
 ## Project structure
 
 ```
@@ -64,3 +66,4 @@ scripts/
 - Try sentence embeddings or gradient boosting.
 - Add more than two model tiers.
 - Log routing decisions in production and retrain as traffic changes.
+- Decrease latency for generating time
