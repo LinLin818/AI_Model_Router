@@ -60,9 +60,10 @@ scripts/
 | `--cheap-cost` / `--strong-cost` | Relative cost per call for each model. |
 | `--backend embeddings` | Use sentence embeddings instead of TF-IDF. |
 
+<img src="Screenshot 2026-10-27 at 10.34.49 PM.png" alt="App Screenshot" width="500">
+
 ## Ideas for next steps
 
-- Train on real prompts and compare against the demo results.
 - Try sentence embeddings or gradient boosting.
 - Add more than two model tiers.
 - Log routing decisions in production and retrain as traffic changes.
